@@ -13,18 +13,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from typing import Tuple
 
 
-def parse_data(filename: str) -> Tuple[list[int], list[list[Tuple[int, int, int]]]]:
+def parse_data(filename: str) -> tuple[list[int], list[list[tuple[int, int, int]]]]:
     with open(filename) as f:
         lines = f.readlines()
 
     lines = [line.strip() for line in lines]
 
     assert lines[0].startswith("seeds: ")
-    seeds = lines[0][len("seeds: ") :].split()
-    seeds = list([int(s) for s in seeds])
+    seeds_strs = lines[0][len("seeds: ") :].split()
+    seeds = list(int(s) for s in seeds_strs)
 
     seed_to_stuff = []
     current_map = None
@@ -44,19 +43,21 @@ def parse_data(filename: str) -> Tuple[list[int], list[list[Tuple[int, int, int]
     return seeds, seed_to_stuff
 
 
-seeds, stuffs = parse_data("input.txt")
-
-
-def get_seed_dest(seed, ranges):
+def resolve_location(seed: int, ranges: list[tuple[int, int, int]]):
     for r in ranges:
         if seed in range(r[1], r[1] + r[2]):
             return r[0] + (seed - r[1])
     return seed
 
 
-wops = [s for s in seeds]
-for stuff in stuffs:
-    for n, w in enumerate(wops):
-        wops[n] = get_seed_dest(w, stuff)
+def main() -> None:
+    data, functions = parse_data("input.txt")
 
-assert min(wops) == 57075758
+    for function in functions:
+        data = [resolve_location(seed, function) for seed in data]
+
+    assert min(data) == 57075758
+
+
+if __name__ == "__main__":
+    main()

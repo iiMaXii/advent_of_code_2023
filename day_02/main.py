@@ -13,15 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
-# Quick and dirty solution
-# Sorry for bad code :)
-
-
 from dataclasses import dataclass
 
-with open('input.txt') as f:
-    lines = f.readlines()
 
 @dataclass
 class Reveale:
@@ -30,52 +23,46 @@ class Reveale:
     g: int = 0
     b: int = 0
 
-##########
-# Task 1 #
-##########
 
-games: list[list[Reveale]] = []
-for n, line in enumerate(lines, 1):
-    line = line.strip()
+def parse_games(filename: str) -> list[list[Reveale]]:
+    with open(filename) as f:
+        lines = f.readlines()
+    games: list[list[Reveale]] = []
+    for n, line in enumerate(lines, 1):
+        line = line.strip()
 
-    assert line.startswith(f'Game {n}: ')
-    _, line = line.split(':')
+        assert line.startswith(f"Game {n}: ")
+        _, line = line.split(":")
 
-    game = []
-    reveals = line.split('; ')
+        game = []
+        reveals = line.split("; ")
 
-    for rev in reveals:
-        color_reveal = Reveale(n)
-        for r in rev.split(', '):
-            if r.endswith(' red'):
-                color_reveal.r = int(r[:-4])
-            elif r.endswith(' green'):
-                color_reveal.g = int(r[:-6])
-            elif r.endswith(' blue'):
-                color_reveal.b = int(r[:-5])
-            else:
-                raise RuntimeError(f'error show not be possible: "{r}"')
-        
-        game.append(color_reveal)
-    games.append(game)
+        for rev in reveals:
+            color_reveal = Reveale(n)
+            for r in rev.split(", "):
+                if r.endswith(" red"):
+                    color_reveal.r = int(r[:-4])
+                elif r.endswith(" green"):
+                    color_reveal.g = int(r[:-6])
+                elif r.endswith(" blue"):
+                    color_reveal.b = int(r[:-5])
+                else:
+                    raise RuntimeError(f'error show not be possible: "{r}"')
+
+            game.append(color_reveal)
+        games.append(game)
+    return games
 
 
-count = 0
-for g in games:
-    possible = True
-    for r in g:
+def include_game(game) -> bool:
+    for r in game:
         if r.r > 12 or r.g > 13 or r.b > 14:
-            possible = False
-    if possible:
-        count += r.game_round
+            return False
+    return True
 
-assert count == 2239
 
-##########
-# Task 2 #
-##########
-
-def get_fewest_power(game):
+def get_fewest_power(game: list[Reveale]) -> int:
+    """Part 2"""
     min_r = 0
     min_g = 0
     min_b = 0
@@ -85,9 +72,26 @@ def get_fewest_power(game):
         min_b = max(min_b, r.b)
     return min_r * min_g * min_b
 
-sum = 0
-for g in games:
-    p = get_fewest_power(g)
-    sum += p
 
-assert sum == 83435
+def main() -> None:
+    games = parse_games("input.txt")
+
+    ##########
+    # Part 1 #
+    ##########
+
+    result = sum(n for n, game in enumerate(games, 1) if include_game(game))
+
+    assert result == 2239
+
+    ##########
+    # Part 2 #
+    ##########
+
+    result = sum(get_fewest_power(g) for g in games)
+
+    assert result == 83435
+
+
+if __name__ == "__main__":
+    main()

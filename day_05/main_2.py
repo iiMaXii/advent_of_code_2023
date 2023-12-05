@@ -14,10 +14,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 
-def range_intersection(r1: range, r2: range) -> Optional[range]:
+def range_intersection(r1: range, r2: range) -> range | None:
     start = max(r1.start, r2.start)
     stop = min(r1.stop, r2.stop)
 
@@ -67,7 +66,7 @@ class RangeFunction:
         self.in_range = range(source, source + length)
         self.offset = dest - source
 
-    def transform_range(self, input_range: range, rest: list) -> Optional[range]:
+    def transform_range(self, input_range: range, rest: list[range]) -> range | None:
         intersection = range_intersection(self.in_range, input_range)
 
         for r in range_left_disjoint(input_range, self.in_range):
@@ -79,15 +78,15 @@ class RangeFunction:
         return range_offset(intersection, self.offset)
 
 
-def parse_data(filename: str) -> Tuple[list[int], list[list[RangeFunction]]]:
+def parse_data(filename: str) -> tuple[list[int], list[list[RangeFunction]]]:
     with open(filename) as f:
         lines = f.readlines()
 
     lines = [line.strip() for line in lines]
 
     assert lines[0].startswith("seeds: ")
-    seeds = lines[0][len("seeds: ") :].split()
-    seeds = list([int(s) for s in seeds])
+    seeds_strs = lines[0][len("seeds: ") :].split()
+    seeds = list(int(s) for s in seeds_strs)
 
     range_functions = []
     current_map = None
@@ -107,22 +106,27 @@ def parse_data(filename: str) -> Tuple[list[int], list[list[RangeFunction]]]:
     return seeds, range_functions
 
 
-seeds, range_functions = parse_data("input.txt")
+def main() -> None:
+    seeds, range_functions = parse_data("input.txt")
 
-input_data = []
-for n in range(0, len(seeds), 2):
-    input_data.append(range(seeds[n], seeds[n] + seeds[n + 1]))
+    input_data: list[range] = []
+    for n in range(0, len(seeds), 2):
+        input_data.append(range(seeds[n], seeds[n] + seeds[n + 1]))
 
-for stage in range_functions:
-    results = []
-    for func in stage:
-        other = []
-        for r in input_data:
-            new_range = func.transform_range(r, other)
-            if new_range:
-                results.append(new_range)
-        input_data = other
+    for stage in range_functions:
+        results: list[range] = []
+        for func in stage:
+            other: list[range] = []
+            for r in input_data:
+                new_range = func.transform_range(r, other)
+                if new_range:
+                    results.append(new_range)
+            input_data = other
 
-    input_data = results + input_data
+        input_data = results + input_data
 
-assert min([r.start for r in input_data]) == 31161857
+    assert min(r.start for r in input_data) == 31161857
+
+
+if __name__ == "__main__":
+    main()

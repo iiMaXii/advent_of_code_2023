@@ -14,40 +14,46 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-with open('C:/Users/iiMaXii/Python/advent_of_code_2023/day_01/input.txt') as f:
+with open("input.txt") as f:
     lines = f.readlines()
 
 ##########
-# Task 1 #
+# Part 1 #
 ##########
 
-def get_digit(line):
+
+def get_digit(line: str) -> int:
     for c in line:
         if c.isdigit():
             return int(c)
+
+    raise ValueError(f"expected integer in line {line}")
+
 
 digits = []
 for line in lines:
     first_digit = get_digit(line)
     last_digit = get_digit(reversed(line))
 
-    digits.append(first_digit*10+last_digit)
+    digits.append(first_digit * 10 + last_digit)
 
 assert sum(digits) == 53334
 
 ##########
-# Task 2 #
+# Part 2 #
 ##########
 
-DIGITS_ALPHA = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+DIGITS_ALPHA = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+
+
 def get_digits(line):
     numbers = {}
 
-    for n in range(1,10):
+    for n in range(1, 10):
         idx = line.find(str(n))
         if idx != -1:
             numbers[idx] = n
-        
+
         idx = line.rfind(str(n))
         if idx != -1:
             numbers[idx] = n
@@ -55,20 +61,21 @@ def get_digits(line):
     for n, a in enumerate(DIGITS_ALPHA):
         idx = line.find(a)
         if idx != -1:
-            numbers[idx] = n+1
+            numbers[idx] = n + 1
 
         idx = line.rfind(a)
         if idx != -1:
-            numbers[idx] = n+1
-    
+            numbers[idx] = n + 1
+
     a = sorted(numbers.items())
 
     return a[0][1], a[-1][1]
+
 
 numbers = []
 for line in lines:
     first_digit, last_digit = get_digits(line)
 
-    numbers.append(first_digit*10+last_digit)
+    numbers.append(first_digit * 10 + last_digit)
 
 assert sum(numbers) == 52834

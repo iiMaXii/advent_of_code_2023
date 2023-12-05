@@ -14,67 +14,72 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-def parse_numbers(filename: str) -> list[list]:
-    with open('input.txt') as f:
+
+def parse_numbers(filename: str) -> list[tuple[list, list]]:
+    with open(filename) as f:
         lines = f.readlines()
 
     lines = [line.strip() for line in lines]
 
     cards = []
     for n, line in enumerate(lines, 1):
-        assert line.startswith(f'Card {n:>3}: ')
-        line = line[len(f'Card {n:>3}: '):]
+        assert line.startswith(f"Card {n:>3}: ")
+        line = line[len(f"Card {n:>3}: ") :]
 
-        win, your = line.split('|')
-        win = win.strip().split(' ')
-        your = your.strip().split(' ')
+        winning_numbers_str, my_numbers_str = line.split("|")
 
-        # Remove blank spaces from splitting
-        win = [w for w in win if w]
-        your = [w for w in your if w]
+        winning_numbers_strs = winning_numbers_str.strip().split(" ")
+        my_numbers_strs = my_numbers_str.strip().split(" ")
 
-        winning = [int(w) for w in win]
-        my_numbers = [int(y) for y in your]
+        # Remove blank spaces from splitting and parse as ints
+        winning_numbers = [int(w) for w in winning_numbers_strs if w]
+        my_numbers = [int(m) for m in my_numbers_strs if m]
 
-        cards.append([winning, my_numbers])
+        cards.append((winning_numbers, my_numbers))
 
     return cards
 
-cards = parse_numbers('input.txt')
 
-##########
-# Part 1 #
-##########
+def main() -> None:
+    cards = parse_numbers("input.txt")
 
-total = 0
-for card in cards:
-    round_points = 0
-    for win in card[0]:
-        if win in card[1]:
-            if round_points == 0:
-                round_points = 1
-            else:
-                round_points *= 2
-    total += round_points
+    ##########
+    # Part 1 #
+    ##########
 
-assert total == 19135
+    total = 0
+    for card in cards:
+        round_points = 0
+        for win in card[0]:
+            if win in card[1]:
+                if round_points == 0:
+                    round_points = 1
+                else:
+                    round_points *= 2
+        total += round_points
 
-##########
-# Part 2 #
-##########
+    assert total == 19135
 
-card_count = [1 for _ in cards]
-for game_num, card in enumerate(cards):
-    round_multiplier = card_count[game_num]
-    round_wins = 0
-    for win in card[0]:
-        if win in card[1]:
-            round_wins += 1
-    
-    # increase card counts
-    for i in range(game_num+1, game_num+round_wins+1):
-        if i > len(card_count):
-            break
-        card_count[i] += 1 * round_multiplier
+    ##########
+    # Part 2 #
+    ##########
 
-assert sum(card_count) == 5704953
+    card_count = [1 for _ in cards]
+    for game_num, card in enumerate(cards):
+        round_multiplier = card_count[game_num]
+        round_wins = 0
+        for win in card[0]:
+            if win in card[1]:
+                round_wins += 1
+
+        # increase card counts
+        for i in range(game_num + 1, game_num + round_wins + 1):
+            if i > len(card_count):
+                break
+            card_count[i] += 1 * round_multiplier
+
+    assert sum(card_count) == 5704953
+
+
+if __name__ == "__main__":
+    main()
