@@ -55,6 +55,7 @@ def parse_games(filename: str) -> list[list[Reveale]]:
 
 
 def include_game(game) -> bool:
+    """Part 1"""
     for r in game:
         if r.r > 12 or r.g > 13 or r.b > 14:
             return False

@@ -64,7 +64,6 @@ def parse_schema(filename: str) -> tuple[list[SchemaSymbol], list[SchemaNumber]]
                 # symbol
                 symbols.append(SchemaSymbol(value=c, coordinates=Point(x, y)))
 
-        # this part is important not to miss
         if current_part_number:
             part_numbers.append(current_part_number)
             current_part_number = None

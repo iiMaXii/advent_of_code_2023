@@ -30,7 +30,7 @@ def parse_data(filename: str):
 
 
 
-def ways_to_win(current_winning_time: int, winning_distance: int):
+def ways_to_win(current_winning_time: int, winning_distance: int) -> int:
     count = 0
     for hold_time in range(1, current_winning_time):
         distance = hold_time * (current_winning_time - hold_time)

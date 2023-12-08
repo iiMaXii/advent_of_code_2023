@@ -27,7 +27,7 @@ def get_digit(line: str) -> int:
         if c.isdigit():
             return int(c)
 
-    raise ValueError(f"expected integer in line {line}")
+    raise ValueError(f"expected digit in line {line}")
 
 
 digits = []
